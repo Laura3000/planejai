@@ -45,10 +45,31 @@ export const useInsight = (id: string) => {
         } as SimulationRecord)
 
         return data
-      } catch {
-        setError(
-          "O serviço de inteligência artifical está temporariamente ocupado ou atingiu o limite de requisições. Por favor, aguarde alguns segundos e clique em 'Tentar novamente'.",
-        )
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error)
+        const normalizedError = errorMessage.toUpperCase()
+
+        if (
+          normalizedError.includes('429') ||
+          normalizedError.includes('QUOTA') ||
+          normalizedError.includes('RESOURCE_EXHAUSTED')
+        ) {
+          setError(
+            'Limite de consultas temporariamente atingido. Por favor, aguarde cerca de 1 minuto e tente novamente.',
+          )
+        } else if (
+          normalizedError.includes('503') ||
+          normalizedError.includes('UNAVAILABLE')
+        ) {
+          setError(
+            'O serviço de inteligência artificial está temporariamente ocupado. Tente novamente em instantes.',
+          )
+        } else {
+          setError(
+            'Não foi possível gerar o diagnóstico financeiro no momento. Tente novamente.',
+          )
+        }
       } finally {
         isRequestPending.current = false
         setIsLoading(false)
