@@ -11,7 +11,7 @@ interface GeminiResponse {
 }
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY
-const MODEL_NAME = 'gemini-1.5-flash'
+const MODEL_NAME = 'gemini-flash-latest'
 
 const getGeminiUrl = () => {
   if (!API_KEY) {
