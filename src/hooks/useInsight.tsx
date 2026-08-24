@@ -45,11 +45,9 @@ export const useInsight = (id: string) => {
         } as SimulationRecord)
 
         return data
-      } catch (error) {
+      } catch {
         setError(
-          error instanceof Error
-            ? error.message
-            : 'Erro ao gerar o diagnóstico. Tente novamente.',
+          "O serviço de inteligência artifical está temporariamente ocupado ou atingiu o limite de requisições. Por favor, aguarde alguns segundos e clique em 'Tentar novamente'.",
         )
       } finally {
         isRequestPending.current = false
