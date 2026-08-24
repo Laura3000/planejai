@@ -1,75 +1,68 @@
-# React + TypeScript + Vite
+# Planej.ai
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicacao web para ajudar o usuario a organizar informacoes financeiras e
+avaliar uma meta. Ao final do formulario, o projeto calcula a economia mensal
+disponivel e apresenta um diagnostico personalizado com a API Gemini.
 
-Currently, two official plugins are available:
+## Como executar
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Pre-requisitos: Node.js e pnpm instalados.
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+pnpm install
+pnpm dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Depois, abra a URL exibida pelo Vite, normalmente `http://localhost:5173`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Para validar o projeto:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+pnpm lint
+pnpm build
 ```
+
+Para usar a Gemini, crie um arquivo `.env.local` na raiz do projeto:
+
+```env
+VITE_GEMINI_API_KEY=sua-chave-aqui
+```
+
+## Tecnologias usadas
+
+- React
+- TypeScript
+- Vite
+- React Router
+- Tailwind CSS
+- Lucide React
+- API Gemini
+- LocalStorage do navegador
+- ESLint e Prettier
+
+## Melhoria implementada
+
+Foi implementado um fluxo de resultados com persistencia no `localStorage`.
+Cada simulacao recebe um identificador unico, fica salva no navegador e pode ser
+consultada na pagina de resultados. A aplicacao tambem envia os dados da
+simulacao para a Gemini e exibe um diagnostico financeiro personalizado.
+
+## Como testar o fluxo principal
+
+1. Execute `pnpm dev`.
+2. Acesse a pagina inicial.
+3. Preencha as seis etapas da simulacao.
+4. Clique em **Gerar simulacao**.
+5. Confira os valores na pagina de resultados.
+6. No DevTools, abra **Application > Local Storage** e verifique a chave
+   `simulation-data`.
+7. Na aba **Network**, confira a requisicao para
+   `generativelanguage.googleapis.com`.
+
+## O que aprendi
+
+Durante o desafio, aprendi a organizar um projeto React por componentes e
+responsabilidades, configurar aliases de importacao, persistir dados no
+`localStorage`, criar rotas com parametros e integrar uma API externa. Tambem
+pratiquei validacao de tipos com TypeScript, organizacao de imports com ESLint
+e formatacao automatica com Prettier.
