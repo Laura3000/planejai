@@ -22,25 +22,41 @@ const getGeminiUrl = () => {
 }
 
 const callGeminiAPI = async (prompt: string) => {
-  const response = await fetch(getGeminiUrl(), {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: {
-        responseMimeType: 'application/json',
-      },
-    }),
-  })
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 30000)
 
-  if (!response.ok) {
-    const errorBody = await response.text()
-    throw new Error(
-      `Erro na requisição: ${response.status}${errorBody ? ` - ${errorBody}` : ''}`,
-    )
+  try {
+    const response = await fetch(getGeminiUrl(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          responseMimeType: 'application/json',
+        },
+      }),
+    })
+
+    if (!response.ok) {
+      const errorBody = await response.text()
+      throw new Error(
+        `Erro na requisição: ${response.status}${errorBody ? ` - ${errorBody}` : ''}`,
+      )
+    }
+
+    return (await response.json()) as GeminiResponse
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw new Error('A Gemini demorou para responder. Tente novamente.', {
+        cause: error,
+      })
+    }
+
+    throw error
+  } finally {
+    clearTimeout(timeout)
   }
-
-  return (await response.json()) as GeminiResponse
 }
 
 export interface InsightData {
