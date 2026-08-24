@@ -1,8 +1,7 @@
 # Planej.ai
 
-Aplicacao web para ajudar o usuario a organizar informacoes financeiras e
-avaliar uma meta. Ao final do formulario, o projeto calcula a economia mensal
-disponivel e apresenta um diagnostico personalizado com a API Gemini.
+Aplicacao web de educacao financeira que ajuda o usuario a planejar metas,
+calcular a economia mensal e receber insights personalizados com a API Gemini.
 
 ## Como executar
 

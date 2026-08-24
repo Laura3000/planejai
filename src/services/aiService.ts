@@ -3,24 +3,41 @@ interface GeminiResponse {
     content: {
       parts: { text: string }[]
     }
+    finishReason?: string
   }[]
+  promptFeedback?: {
+    blockReason?: string
+  }
 }
 
-const API_KEY = String(import.meta.env.VITE_GEMINI_API_KEY)
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY
 const MODEL_NAME = 'gemini-flash-latest'
-const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${API_KEY}`
+
+const getGeminiUrl = () => {
+  if (!API_KEY) {
+    throw new Error('VITE_GEMINI_API_KEY não foi configurada.')
+  }
+
+  return `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${API_KEY}`
+}
 
 const callGeminiAPI = async (prompt: string) => {
-  const response = await fetch(GEMINI_API_URL, {
+  const response = await fetch(getGeminiUrl(), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: {
+        responseMimeType: 'application/json',
+      },
     }),
   })
 
   if (!response.ok) {
-    throw new Error(`Erro na requisição: ${response.status}`)
+    const errorBody = await response.text()
+    throw new Error(
+      `Erro na requisição: ${response.status}${errorBody ? ` - ${errorBody}` : ''}`,
+    )
   }
 
   return (await response.json()) as GeminiResponse
@@ -40,6 +57,20 @@ export interface InsightData {
 
 export const getInsight = async (prompt: string) => {
   const response = await callGeminiAPI(prompt)
-  const json = response.candidates[0].content.parts[0].text
+  const candidate = response.candidates?.[0]
+  const text = candidate?.content?.parts
+    ?.map((part) => part.text)
+    .filter(Boolean)
+    .join('')
+
+  if (!text) {
+    const reason =
+      response.promptFeedback?.blockReason ?? candidate?.finishReason
+    throw new Error(
+      `A Gemini não retornou conteúdo${reason ? `: ${reason}` : '.'}`,
+    )
+  }
+
+  const json = text.replace(/^```(?:json)?\s*|\s*```$/gi, '').trim()
   return JSON.parse(json) as InsightData
 }
